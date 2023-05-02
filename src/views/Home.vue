@@ -91,6 +91,16 @@
         </v-card>
 
         <br />
+
+        <v-footer
+            color="indigo"
+            app
+            dark
+            height="auto"
+            style="position: absolute; bottom: 0; width: 100%"
+        >
+            <span class="white--text">Aliif, Fachrisa, Ferry &copy; 2023</span>
+        </v-footer>
     </v-container>
 
     <v-snackbar v-model="snackbar">
