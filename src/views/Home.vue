@@ -34,7 +34,7 @@
 
         <br />
 
-        <v-card v-if="jadwal && jenis == 'Per - Hari'">
+        <v-card v-if="jadwal && jenis == 'Per - Hari' && displaydate">
             <v-card-title>
                 <h2>Jadwal Sholat Harian {{ jadwal.data.lokasi }}</h2>
             </v-card-title>
@@ -62,7 +62,7 @@
             </v-card-text>
         </v-card>
 
-        <v-card v-if="jadwal && jenis == 'Per - Bulan'">
+        <v-card v-if="jadwal && jenis == 'Per - Bulan' && displaymonth">
             <v-card-title>
                 <h2>Jadwal Sholat Bulanan {{ jadwal.data.lokasi }}</h2>
             </v-card-title>
@@ -92,6 +92,16 @@
 
         <br />
     </v-container>
+
+    <v-snackbar v-model="snackbar">
+        pilih jenis jadwal dan kota terlebih dahulu
+
+        <template v-slot:actions>
+            <v-btn color="blue" variant="text" @click="snackbar = false">
+                Close
+            </v-btn>
+        </template>
+    </v-snackbar>
 </template>
 
 <script>
@@ -100,7 +110,10 @@ export default {
     data() {
         return {
             location: null,
+            snackbar: false,
             jenis: null,
+            displaymonth: false,
+            displaydate: false,
             kota: null,
             lat: null,
             long: null,
@@ -150,14 +163,19 @@ export default {
             this.nowmonth = new Date().getMonth() + 1;
             this.nowyear = new Date().getFullYear();
 
+            if (this.jenis == null || this.kota == null) {
+                this.snackbar = true;
+            }
+
             if (this.jenis == "Per - Hari") {
                 this.fetchJadwalHarian();
-            } else {
+            } else if (this.jenis == "Per - Bulan") {
                 this.fetchJadwalBulanan();
             }
         },
 
         async fetchJadwalHarian() {
+            this.displaymonth = false;
             const Jadwal = await axios.get(
                 "https://api.myquran.com/v1/sholat/jadwal/" +
                     this.kota.id +
@@ -169,10 +187,11 @@ export default {
                     this.nowdate
             );
             this.jadwal = Jadwal.data;
-            console.log(this.jadwal.data);
+            this.displaydate = true;
         },
 
         async fetchJadwalBulanan() {
+            this.displaydate = false;
             const Jadwal = await axios.get(
                 "https://api.myquran.com/v1/sholat/jadwal/" +
                     this.kota.id +
@@ -182,7 +201,7 @@ export default {
                     this.nowmonth
             );
             this.jadwal = Jadwal.data;
-            console.log(this.jadwal.data);
+            this.displaymonth = true;
         },
     },
     async mounted() {
